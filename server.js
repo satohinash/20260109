@@ -5,7 +5,7 @@ import { serveStatic } from "https://deno.land/x/hono@v4.3.11/middleware.ts";
 const app = new Hono();
 const kv = await Deno.openKv();
 
-// APIのルートを先に定義する（静的ファイルより先に書くのがコツです）
+// APIのルートを先に定義する
 app.post("/api/register", async (c) => {
   const { username, password } = await c.req.json();
   if (!username || !password) return c.json({ msg: "未入力項目があります" }, 400);
