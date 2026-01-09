@@ -1,6 +1,6 @@
 // ✅ deno.json を使っている場合の書き方
-import { Hono } from "hono/mod.ts"; 
-import { serveStatic } from "hono/middleware.ts";
+import { Hono } from "https://deno.land/x/hono@v4.3.11/mod.ts";
+import { serveStatic } from "https://deno.land/x/hono@v4.3.11/middleware.ts";
 
 const app = new Hono();
 const kv = await Deno.openKv();
