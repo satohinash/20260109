@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>アイテム管理</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/petite-vue"></script>
+    <script src="client.js" defer></script>
+</head>
+<body class="bg-gray-50 p-4">
+    <div id="app" v-scope @mounted="init()">
+        <div class="max-w-md mx-auto bg-white p-6 rounded-xl shadow-lg">
+            <h1 class="text-2xl font-bold mb-6 text-center text-gray-800">📦 アイテム管理</h1>
+
+            <div v-if="!isLoggedIn" class="space-y-4">
+                <div class="flex border-b">
+                    <button @click="isRegisterPage = false; message = ''" :class="!isRegisterPage ? 'border-b-2 border-blue-500 text-blue-500' : 'text-gray-400'" class="flex-1 py-2 font-bold">ログイン</button>
+                    <button @click="isRegisterPage = true; message = ''" :class="isRegisterPage ? 'border-b-2 border-blue-500 text-blue-500' : 'text-gray-400'" class="flex-1 py-2 font-bold">新規登録</button>
+                </div>
+                
+                <div class="space-y-2">
+                    <input v-model="user.username" placeholder="ユーザー名" class="w-full border p-3 rounded-lg">
+                    <input v-model="user.password" type="password" placeholder="パスワード" class="w-full border p-3 rounded-lg">
+                </div>
+
+                <button v-if="!isRegisterPage" @click="login()" class="w-full bg-blue-600 text-white p-3 rounded-lg font-bold hover:bg-blue-700">ログインする</button>
+                <button v-else @click="register()" class="w-full bg-green-600 text-white p-3 rounded-lg font-bold hover:bg-green-700">アカウントを作成</button>
+                
+                <p v-if="message" class="text-red-500 text-sm text-center font-bold">{{ message }}</p>
+            </div>
+
+            <div v-else>
+                <div class="mb-6 flex justify-between items-center bg-gray-100 p-2 rounded-lg">
+                    <span class="font-medium text-gray-700">👤 {{ user.username }}</span>
+                    <button @click="logout()" class="text-xs text-gray-500 underline">ログアウト</button>
+                </div>
+
+                <div class="bg-blue-50 p-4 rounded-xl mb-6 border border-blue-100">
+                    <h2 class="text-sm font-bold text-blue-800 mb-3">{{ form.id ? 'アイテムの編集' : '新しいアイテムを登録' }}</h2>
+                    <input v-model="form.name" placeholder="アイテム名" class="w-full border p-2 rounded mb-2 text-sm">
+                    <div class="flex gap-2 mb-2">
+                        <input v-model.number="form.count" type="number" placeholder="個数" class="w-1/3 border p-2 rounded text-sm">
+                        <input v-model="form.tagInput" placeholder="#タグ #分類" class="w-2/3 border p-2 rounded text-sm">
+                    </div>
+                    <div class="mb-3">
+                        <label class="block text-xs text-gray-500 mb-1">画像を選択</label>
+                        <input type="file" @change="uploadImage" class="text-xs w-full">
+                    </div>
+                    <button @click="saveItem()" class="w-full bg-blue-600 text-white p-2 rounded-lg font-bold shadow-sm">
+                        {{ form.id ? '変更を保存する' : 'リストに追加する' }}
+                    </button>
+                    <button v-if="form.id" @click="resetForm()" class="w-full text-xs text-gray-400 mt-2">キャンセル</button>
+                </div>
+
+                <div class="relative mb-6">
+                    <input v-model="searchTag" @input="fetchItems()" placeholder="🔍 #タグで絞り込み" class="w-full border-b-2 border-gray-200 py-2 pl-2 focus:border-blue-400 outline-none">
+                </div>
+
+                <div class="space-y-3">
+                    <div v-for="item in items" :key="item.id" class="flex items-center p-3 bg-white border border-gray-100 rounded-xl shadow-sm">
+                        <img :src="item.image || 'https://via.placeholder.com/80'" class="w-16 h-16 object-cover rounded-lg mr-4 border border-gray-100">
+                        <div class="flex-1">
+                            <div class="font-bold text-gray-800">{{ item.name }}</div>
+                            <div class="text-sm text-gray-500">個数: <span class="font-bold text-gray-700">{{ item.count }}</span></div>
+                            <div class="flex flex-wrap gap-1 mt-1">
+                                <span v-for="t in item.tags" class="text-[10px] bg-blue-100 text-blue-600 px-2 py-0.5 rounded-full font-bold">#{{ t }}</span>
+                            </div>
+                        </div>
+                        <div class="flex flex-col gap-2">
+                            <button @click="editItem(item)" class="text-[10px] font-bold bg-gray-100 text-gray-600 px-3 py-1.5 rounded-lg">変更</button>
+                            <button @click="deleteItem(item.id)" class="text-[10px] font-bold text-red-400">削除</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
